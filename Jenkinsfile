@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Selvam3195/Devops_Build.git'
+                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Selvam3195/Finalproject.git'
             }
         }
 

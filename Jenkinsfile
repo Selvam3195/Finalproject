@@ -9,14 +9,6 @@ pipeline {
         EC2_USER = "ubuntu"
         EC2_HOST = "13.126.184.15"
     }
-
-    stages {
-        stage('Checkout Code') {
-            steps {
-                git branch: "${env.Devops_Build}", url: 'https://github.com/Selvam3195/Finalproject.git
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 script {

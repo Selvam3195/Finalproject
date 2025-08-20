@@ -13,7 +13,7 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: "${env.Devops_Build}", url: 'https://github.com/Selvam3195/Devops_Build.git'
+                git branch: "${env.BRANCH_NAME}", url: 'https://github.com/Selvam3195/Devops_Build.git'
             }
         }
 
@@ -30,16 +30,14 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry("https://index.docker.io/v1/", DOCKERHUB_CREDENTIALS) {
-                        if (env.Devops_Build== 'dev') {
+                        if (env.BRANCH_NAME == 'dev') {
                             sh """
-                                docker tag my-react-app:latest ${DEV_IMAGE}:${latest}
-                                docker push ${DEV_IMAGE}:${latest}
+                                docker tag my-react-app:latest ${DEV_IMAGE}:latest
                                 docker push ${DEV_IMAGE}:latest
                             """
-                        } else if (env.Devops_Build== 'master') {
+                        } else if (env.BRANCH_NAME == 'master') {
                             sh """
-                                docker tag my-react-app:latest ${PROD_IMAGE}:${latest}
-                                docker push ${PROD_IMAGE}:${latest}
+                                docker tag my-react-app:latest ${PROD_IMAGE}:latest
                                 docker push ${PROD_IMAGE}:latest
                             """
                         }
@@ -55,10 +53,9 @@ pipeline {
             steps {
                 script {
                     sh """
-                    scp -o StrictHostKeyChecking=no -i ${SSH_KEY} deploy.sh ${EC2_USER}@${EC2_HOST}: .deploy.sh
-                    ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
-                         sh 'chmod +x deploy.sh'
-                    sh './deploy.sh'
+                        scp -o StrictHostKeyChecking=no -i ${SSH_KEY} deploy.sh ${EC2_USER}@${EC2_HOST}:~/deploy.sh
+                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} "chmod +x ~/deploy.sh && ~/deploy.sh"
+                    """
                 }
             }
         }

@@ -48,11 +48,10 @@ pipeline {
                 script {
                     sh """
                     scp -o StrictHostKeyChecking=no -i ${SSH_KEY} deploy.sh ${EC2_USER}@${EC2_HOST}: .deploy.sh
-                    ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
+                   ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} '
                          sh 'chmod +x deploy.sh'
                     sh './deploy.sh'
                 }
             }
-        }
-    }
-}
+    
+

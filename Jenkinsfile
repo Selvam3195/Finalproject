@@ -2,8 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerconnection') 
-        dockerconnection = 'https://index.docker.io/v1/'
+        dockerconnection= credentials('dockerconnection') 
         DEV_IMAGE = "cherry3104/react-app-dev"
         PROD_IMAGE = "cherry3104/react-app-prod"
         SSH_KEY = credentials('ec2-ssh-key') 

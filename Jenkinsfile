@@ -21,28 +21,27 @@ pipeline {
             }
         }
 
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry("https://index.docker.io/v1/", dockerconnection) {
-                        if (env.BRANCH_NAME == 'dev') {
-                            sh """
-                                docker tag my-react-app:latest ${DEV_IMAGE}:${BUILD_TAG}
-                                docker push ${DEV_IMAGE}:${BUILD_TAG}
-                                docker push ${DEV_IMAGE}:latest
-                            """
-                        } else if (env.BRANCH_NAME == 'master') {
-                            sh """
-                                docker tag my-react-app:latest ${PROD_IMAGE}:${BUILD_TAG}
-                                docker push ${PROD_IMAGE}:${BUILD_TAG}
-                                docker push ${PROD_IMAGE}:latest
-                            """
-                        }
-                    }
+      stage('Push Docker Image') {
+    steps {
+        script {
+            docker.withRegistry("https://index.docker.io/v1/", "dockerconnection") {
+                if (env.BRANCH_NAME == 'dev') {
+                    sh """
+                        docker tag my-react-app:latest ${DEV_IMAGE}:${BUILD_TAG}
+                        docker push ${DEV_IMAGE}:${BUILD_TAG}
+                        docker push ${DEV_IMAGE}:latest
+                    """
+                } else if (env.BRANCH_NAME == 'master') {
+                    sh """
+                        docker tag my-react-app:latest ${PROD_IMAGE}:${BUILD_TAG}
+                        docker push ${PROD_IMAGE}:${BUILD_TAG}
+                        docker push ${PROD_IMAGE}:latest
+                    """
                 }
             }
         }
-
+    }
+}
         stage('Deploy') {
             when {
                 branch 'master'

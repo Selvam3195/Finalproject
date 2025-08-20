@@ -24,7 +24,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry("https://index.docker.io/v1/", DOCKERHUB_CREDENTIALS) {
+                    docker.withRegistry("https://index.docker.io/v1/", dockerconnection) {
                         if (env.BRANCH_NAME == 'dev') {
                             sh """
                                 docker tag my-react-app:latest ${DEV_IMAGE}:${BUILD_TAG}

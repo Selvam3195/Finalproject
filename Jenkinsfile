@@ -43,13 +43,15 @@ pipeline {
     }
 }
         stage('Deploy') {
-            steps {
-                script {
-                    sh """
-                        scp -o StrictHostKeyChecking=no -i ${SSH_KEY} deploy.sh ${EC2_USER}@${EC2_HOST}:~/deploy.sh
-                        ssh -o StrictHostKeyChecking=no -i ${SSH_KEY} ${EC2_USER}@${EC2_HOST} "chmod +x ~/deploy.sh && ~/deploy.sh"
-                    """
-                }
+    steps {
+        withCredentials([sshUserPrivateKey(credentialsId: 'a5feca0c-b7f5-41c9-8641-27dea1e94127', 
+                                           keyFileVariable: 'SSH_KEY')]) {
+            script {
+                sh '''
+                    chmod +x deploy.sh
+                    scp -o StrictHostKeyChecking=no -i $SSH_KEY deploy.sh ubuntu@13.126.184.15:~/deploy.sh
+                    ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@13.126.184.15 "bash ~/deploy.sh"
+                '''
             }
         }
     }

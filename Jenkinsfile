@@ -48,3 +48,20 @@ if (branch == "dev" || branch == "origin/dev") {
         }
     }
 }
+stage('Health Check') {
+    steps {
+        script {
+            try {
+                sh './check_health.sh'
+            } catch (Exception e) {
+                // Send Gmail notification if app is down
+                emailext (
+                    subject: "ALERT: Application is DOWN on EC2",
+                    body: "The React app deployed on EC2 at <EC2_PUBLIC_IP>:3000 is not reachable.",
+                    to: "selva3195@gmail.com"
+                )
+                error "Application health check failed!"
+            }
+        }
+    }
+}

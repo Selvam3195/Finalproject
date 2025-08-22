@@ -3,10 +3,16 @@ set -e
 
 echo "Deploying with docker-compose..."
 
-# Pull latest image
+# Navigate to project folder (adjust if needed)
+cd /home/ubuntu/pro
+
+# Pull the latest image
 docker compose pull
 
-# Restart container
-docker compose up -d
+# Stop and remove old containers
+docker compose down
 
-echo "Deployment successful!"
+# Start fresh containers
+docker compose up -d --build
+
+echo "Deployment completed!"

@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        dockerhubcredentials = credentials('dockerhub-credentials-id')
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-credentials-id'   // matches Jenkins credentials ID
         DOCKER_DEV_REPO = "cherry3104/react-app-dev"
         DOCKER_PROD_REPO = "cherry3104/react-app-prod"
     }
 
     triggers {
-        githubPush()
+        githubPush()   // auto-build on GitHub commits
     }
 
     stages {
@@ -22,13 +22,18 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', dockerhubcredentials) {
-                        if (env.BRANCH_NAME == "dev") {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
+                        // Support both Multibranch Pipeline (BRANCH_NAME) and classic Pipeline (GIT_BRANCH)
+                        def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
+
+                        if (branch == "dev" || branch == "origin/dev") {
                             sh "docker tag my-react-app:latest ${DOCKER_DEV_REPO}:latest"
                             sh "docker push ${DOCKER_DEV_REPO}:latest"
-                        } else if (env.BRANCH_NAME == "master") {
+                        } else if (branch == "master" || branch == "origin/master") {
                             sh "docker tag my-react-app:latest ${DOCKER_PROD_REPO}:latest"
                             sh "docker push ${DOCKER_PROD_REPO}:latest"
+                        } else {
+                            echo "Branch ${branch} is not configured for Docker push."
                         }
                     }
                 }

@@ -5,7 +5,7 @@ pipeline {
         dockerconnection = credentials('dockerconnection')
         DEV_IMAGE = "cherry3104/react-app-dev"
         PROD_IMAGE = "cherry3104/react-app-prod"
-        SSH_KEY = credentials('ec2-ssh-key')
+        SSH_KEY = credentials('ssh')
         EC2_USER = "ubuntu"
         EC2_HOST = "13.126.184.15"
         BUILD_TAG = "${env.BUILD_NUMBER}"  // unique tag for each build
@@ -46,7 +46,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 withCredentials([sshUserPrivateKey(
-                    credentialsId: 'ec2-ssh-key',
+                    credentialsId: 'ssh',
                     keyFileVariable: 'SSH_KEY'
                 )]) {
                     script {

@@ -1,16 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "Deploying Docker container..."
+echo "Deploying with docker-compose..."
 
-# Stop and remove old container if running
-docker stop react-app || true
-docker rm react-app || true
+# Pull latest image
+docker-compose pull
 
-# Pull latest image from DockerHub
-docker pull cherry3104/react-app-prod:latest
-
-# Run new container
-docker run -d -p 80:80 --name react-app cherry3104/react-app-prod:latest
+# Restart container
+docker-compose up -d
 
 echo "Deployment successful!"

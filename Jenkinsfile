@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        dockerhub-credentials-id = credentials('dockerhub-credentials-id')
+        dockerhubcredentials = credentials('dockerhub-credentials-id')
         DOCKER_DEV_REPO = "cherry3104/react-app-dev"
         DOCKER_PROD_REPO = "cherry3104/react-app-prod"
     }
@@ -22,7 +22,7 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', dockerhub-credentials-id) {
+                    docker.withRegistry('https://index.docker.io/v1/', dockerhubcredentials) {
                         if (env.BRANCH_NAME == "dev") {
                             sh "docker tag my-react-app:latest ${DOCKER_DEV_REPO}:latest"
                             sh "docker push ${DOCKER_DEV_REPO}:latest"

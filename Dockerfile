@@ -1,14 +1,14 @@
-# Use official nginx image
+# Use nginx to serve the static files
 FROM nginx:alpine
 
-# Set working directory
-WORKDIR /usr/share/nginx/html
+# Remove default nginx page
+RUN rm -rf /usr/share/nginx/html/*
 
-# Remove default nginx static files
-RUN rm -rf ./*
+# Copy React build folder to nginx
+COPY build /usr/share/nginx/html
 
-# Copy build output to nginx html folder
-COPY . .
+# Custom nginx config (optional but recommended for SPA routing)
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 

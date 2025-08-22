@@ -1,10 +1,16 @@
 #!/bin/bash
-SERVICE_NAME="react-app"
+set -e
+
 echo "Deploying Docker container..."
-docker-compose up -d --build
-if [ $? -eq 0 ]; then
-  echo "Deployment successfull"
-else
-  echo "Deployment failed!"
-  exit 1
-fi
+
+# Stop and remove old container if running
+docker stop react-app || true
+docker rm react-app || true
+
+# Pull latest image from DockerHub
+docker pull cherry3104/react-app-prod:latest
+
+# Run new container
+docker run -d -p 80:80 --name react-app cherry3104/react-app-prod:latest
+
+echo "Deployment successful!"

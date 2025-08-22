@@ -26,7 +26,7 @@ pipeline {
         stage('Push to DockerHub') {
             steps {
                 script {
-                    withDockerRegistry([credentialsId: 'dockerhub-credentials-id', url: 'https://index.docker.io/v1/']) {
+                    withDockerRegistry([credentialsId: 'dockerhubconnection', url: 'https://index.docker.io/v1/']) {
                         if (env.BRANCH_NAME == 'dev') {
                             sh "docker tag ${DOCKER_IMAGE}:latest ${DEV_REPO}:latest"
                             sh "docker push ${DEV_REPO}:latest"

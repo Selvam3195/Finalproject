@@ -1,18 +1,21 @@
 #!/bin/bash
-set -e
 
-echo "Deploying with docker-compose..."
+# Variables
+SERVICE_NAME="react-app"
 
-# Navigate to project folder (adjust if needed)
-cd /home/ubuntu/pro
+echo "📦 Deploying Docker container..."
 
-# Pull the latest image
-docker compose pull
-
-# Stop and remove old containers
+# Stop old container if running
 docker compose down
 
-# Start fresh containers
+# Start with new build
 docker compose up -d --build
 
-echo "Deployment completed!"
+if [ $? -eq 0 ]; then
+  echo "✅ Deployment successful! Service is running."
+  echo "👉 Check app at: http://localhost:3000"
+else
+  echo "❌ Deployment failed!"
+  exit 1
+fi
+

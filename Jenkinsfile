@@ -3,14 +3,15 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials-id')
-        DOCKER_DEV_REPO = "your-dockerhub-username/myapp-dev"
-        DOCKER_PROD_REPO = "your-dockerhub-username/myapp-prod"
+        DOCKER_DEV_REPO = "cherry3104/react-app-dev"
+        DOCKER_PROD_REPO = "cherry3104/react-app-prod"
     }
 
     triggers {
         githubPush()
     }
 
+    stages {
         stage('Build Docker Image') {
             steps {
                 sh 'chmod +x build.sh'
@@ -41,3 +42,4 @@ pipeline {
             }
         }
     }
+}

@@ -24,17 +24,17 @@ pipeline {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
                         // Support both Multibranch Pipeline (BRANCH_NAME) and classic Pipeline (GIT_BRANCH)
-                        def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
+                       def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
 
-                        if (branch == "dev" || branch == "origin/dev") {
-                            sh "docker tag my-react-app:latest ${DOCKER_DEV_REPO}:latest"
-                            sh "docker push ${DOCKER_DEV_REPO}:latest"
-                        } else if (branch == "master" || branch == "origin/master") {
-                            sh "docker tag my-react-app:latest ${DOCKER_PROD_REPO}:latest"
-                            sh "docker push ${DOCKER_PROD_REPO}:latest"
-                        } else {
-                            echo "Branch ${branch} is not configured for Docker push."
-                        }
+if (branch == "dev" || branch == "origin/dev") {
+    sh "docker tag my-react-app:latest ${DOCKER_DEV_REPO}:latest"
+    sh "docker push ${DOCKER_DEV_REPO}:latest"
+} else if (branch == "master" || branch == "origin/master" || branch == "main" || branch == "origin/main") {
+    sh "docker tag my-react-app:latest ${DOCKER_PROD_REPO}:latest"
+    sh "docker push ${DOCKER_PROD_REPO}:latest"
+} else {
+    echo "Branch ${branch} is not configured for Docker push."
+}
                     }
                 }
             }

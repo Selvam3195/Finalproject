@@ -2,13 +2,11 @@ pipeline {
     agent any
 
     environment {
-        dockerconnection = credentials('dockerconnection')
+        DOCKER_CREDS = credentials('dockerconnection') 
         DEV_IMAGE = "cherry3104/react-app-dev"
         PROD_IMAGE = "cherry3104/react-app-prod"
-        SSH_KEY = credentials('ssh')
-        EC2_USER = "ubuntu"
         EC2_HOST = "13.126.184.15"
-        BUILD_TAG = "${env.BUILD_NUMBER}"  // unique tag for each build
+        EC2_USER = "ubuntu"
     }
 
     stages {
@@ -27,14 +25,14 @@ pipeline {
                     docker.withRegistry("https://index.docker.io/v1/", "dockerconnection") {
                         if (env.BRANCH_NAME == 'dev') {
                             sh """
-                                docker tag my-react-app:latest ${DEV_IMAGE}:${BUILD_TAG}
-                                docker push ${DEV_IMAGE}:${BUILD_TAG}
+                                docker tag my-react-app:latest ${DEV_IMAGE}:${BUILD_NUMBER}
+                                docker push ${DEV_IMAGE}:${BUILD_NUMBER}
                                 docker push ${DEV_IMAGE}:latest
                             """
                         } else if (env.BRANCH_NAME == 'master') {
                             sh """
-                                docker tag my-react-app:latest ${PROD_IMAGE}:${BUILD_TAG}
-                                docker push ${PROD_IMAGE}:${BUILD_TAG}
+                                docker tag my-react-app:latest ${PROD_IMAGE}:${BUILD_NUMBER}
+                                docker push ${PROD_IMAGE}:${BUILD_NUMBER}
                                 docker push ${PROD_IMAGE}:latest
                             """
                         }
@@ -45,19 +43,28 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(
-                    credentialsId: 'ssh',
-                    keyFileVariable: 'SSH_KEY'
-                )]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'ssh', keyFileVariable: 'SSH_KEY')]) {
                     script {
-                        sh '''
-                            chmod +x deploy.sh
-                            scp -o StrictHostKeyChecking=no -i $SSH_KEY deploy.sh ubuntu@13.126.184.15:~/deploy.sh
-                            ssh -o StrictHostKeyChecking=no -i $SSH_KEY ubuntu@13.126.184.15 "bash ~/deploy.sh"
-                        '''
+                        if (env.BRANCH_NAME == 'dev') {
+                            sh """
+                                scp -o StrictHostKeyChecking=no -i $SSH_KEY deploy.sh ${EC2_USER}@${EC2_HOST}:~/deploy.sh
+                                ssh -o StrictHostKeyChecking=no -i $SSH_KEY ${EC2_USER}@${EC2_HOST} "bash ~/deploy.sh ${DEV_IMAGE}:latest"
+                            """
+                        } else if (env.BRANCH_NAME == 'master') {
+                            sh """
+                                scp -o StrictHostKeyChecking=no -i $SSH_KEY deploy.sh ${EC2_USER}@${EC2_HOST}:~/deploy.sh
+                                ssh -o StrictHostKeyChecking=no -i $SSH_KEY ${EC2_USER}@${EC2_HOST} "bash ~/deploy.sh ${PROD_IMAGE}:latest"
+                            """
+                        }
                     }
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished. Branch: ${env.BRANCH_NAME}, Build: ${env.BUILD_NUMBER}"
         }
     }
 }

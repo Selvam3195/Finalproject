@@ -45,31 +45,5 @@ pipeline {
                 sh './deploy.sh'
             }
         }
-
-        stage('Check Application Health') {
-            steps {
-                // Ensure the health-check script is executable
-                sh 'chmod +x check_health.sh'
-
-                script {
-                    def result = sh(script: './check_health.sh', returnStatus: true)
-                    if (result != 0) {
-                        currentBuild.result = 'FAILURE'
-                        error("Application is DOWN")
-                    } else {
-                        echo "Application is UP"
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        failure {
-            // Only send notification if build failed (app is down)
-            mail to: 'selva3195@gmail.com',
-                 subject: "Application DOWN on ${env.JOB_NAME}",
-                 body: "The application is down. Please check immediately."
-        }
     }
 }

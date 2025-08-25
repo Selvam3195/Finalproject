@@ -44,13 +44,5 @@ pipeline {
                 sh 'chmod +x deploy.sh'
                 sh './deploy.sh'
             }
-    }
-
-    post {
-        failure {
-            mail to: 'selva3195@example.com',
-                 subject: "Jenkins Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body: "Health Check failed. Please investigate.\n\nLogs: ${env.BUILD_URL}"
         }
-    }
-}
+        

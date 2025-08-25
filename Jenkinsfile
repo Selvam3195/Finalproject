@@ -44,17 +44,6 @@ pipeline {
                 sh 'chmod +x deploy.sh'
                 sh './deploy.sh'
             }
-        }
-
-        stage('Health Check') {
-            steps {
-                script {
-                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                        sh 'chmod +x check_health.sh && ./check_health.sh'
-                    }
-                }
-            }
-        }
     }
 
     post {

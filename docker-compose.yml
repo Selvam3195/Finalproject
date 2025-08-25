@@ -3,5 +3,5 @@ services:
     image: cherry3104/react-app-prod:latest
     container_name: react-app
     ports:
-      - "80:3000"
+      - "3000:80"
     restart: always

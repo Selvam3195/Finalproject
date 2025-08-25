@@ -47,11 +47,19 @@ pipeline {
             }
         }
 
-        stage('Health Check') {
-            steps {
-                sh 'chmod +x check_health.sh'
-                sh './check_health.sh'
+       stage('Health Check') {
+    steps {
+        script {
+            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                sh 'chmod +x check_health.sh && ./check_health.sh'
             }
         }
+    }
+}
+        post {
+    failure {
+        mail to: 'selva3195@example.com',
+             subject: "Jenkins Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+             body: "Health Check failed. Please investigate.\n\nLogs: ${env.BUILD_URL}"
     }
 }

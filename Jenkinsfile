@@ -2,13 +2,13 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_HUB_CREDENTIALS = 'dockerhub-credentials-id'   // matches Jenkins credentials ID
+        DOCKER_HUB_CREDENTIALS = 'dockerhub-credentials-id'
         DOCKER_DEV_REPO = "cherry3104/react-app-dev"
         DOCKER_PROD_REPO = "cherry3104/react-app-prod"
     }
 
     triggers {
-        githubPush()   // auto-build on GitHub commits
+        githubPush()
     }
 
     stages {
@@ -23,7 +23,6 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', DOCKER_HUB_CREDENTIALS) {
-                        // Support both Multibranch Pipeline (BRANCH_NAME) and classic Pipeline (GIT_BRANCH)
                         def branch = env.BRANCH_NAME ?: env.GIT_BRANCH
 
                         if (branch == "dev" || branch == "origin/dev") {
@@ -47,19 +46,22 @@ pipeline {
             }
         }
 
-       stage('Health Check') {
-    steps {
-        script {
-            catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                sh 'chmod +x check_health.sh && ./check_health.sh'
+        stage('Health Check') {
+            steps {
+                script {
+                    catchError(buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
+                        sh 'chmod +x check_health.sh && ./check_health.sh'
+                    }
+                }
             }
         }
     }
-}
-        post {
-    failure {
-        mail to: 'selva3195@example.com',
-             subject: "Jenkins Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-             body: "Health Check failed. Please investigate.\n\nLogs: ${env.BUILD_URL}"
+
+    post {
+        failure {
+            mail to: 'selva3195@example.com',
+                 subject: "Jenkins Pipeline Failed - ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Health Check failed. Please investigate.\n\nLogs: ${env.BUILD_URL}"
+        }
     }
 }

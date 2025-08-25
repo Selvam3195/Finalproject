@@ -8,7 +8,7 @@ pipeline {
     }
 
     triggers {
-        githubPush()
+        githubPush()   // auto-build on GitHub commits
     }
 
     stages {
@@ -45,4 +45,5 @@ pipeline {
                 sh './deploy.sh'
             }
         }
-        
+    }
+}
